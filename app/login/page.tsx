@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
+import { CssVarsProvider } from '@mui/joy/styles';
 import Sheet from '@mui/joy/Sheet';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Typography from '@mui/joy/Typography';
@@ -9,51 +9,51 @@ import FormLabel from '@mui/joy/FormLabel';
 import Input from '@mui/joy/Input';
 import Button from '@mui/joy/Button';
 import Link from '@mui/joy/Link';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { IconButton } from '@mui/joy';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
-function ModeToggle() {
-  const { mode, setMode } = useColorScheme();
-  const [mounted, setMounted] = React.useState(false);
+export default function LoginFinal(props: any) {
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [regid, setRegid] = React.useState<number | null>(null);
+  const [password, setPassword] = React.useState('');
+  const router = useRouter();
 
-  // necessary for server-side rendering
-  // because mode is undefined on the server
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) {
-    return <Button variant="soft">Change mode</Button>;
+  const handelLogin = async () => {
+    try {
+      const res = await axios.post('http://localhost:3333/auth/login', {
+        Regid: regid,
+        password: password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+
+      });
+      console.log(res.data); 
+      await router.push("/dashboard");
+    } catch (error) {
+      console.error('Login failed', error);
+    }
   }
 
   return (
-    <Select
-      variant="soft"
-      value={mode}
-      onChange={(event, newMode) => {
-        setMode(newMode);
-      }}
-      sx={{ width: 'max-content' }}
-    >
-      <Option value="system">System</Option>
-      <Option value="light">Light</Option>
-      <Option value="dark">Dark</Option>
-    </Select>
-  );
-}
-
-export default function LoginFinal(props:any) {
-  return (
-    <main>
+    <main style={{
+      background: 'linear-gradient(to right, #e0f7fa, #e3f2fd)',
+      minHeight: '100vh',
+      padding: '2rem',
+    }}>
       <CssVarsProvider {...props}>
-        <ModeToggle />
         <CssBaseline />
         <Sheet
           sx={{
             width: 300,
-            mx: 'auto', // margin left & right
-            my: 4, // margin top & bottom
-            py: 3, // padding top & bottom
-            px: 2, // padding left & right
+            mx: 'auto',
+            my: 4,
+            py: 3,
+            px: 2,
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
@@ -63,30 +63,38 @@ export default function LoginFinal(props:any) {
           variant="outlined"
         >
           <div>
-            <Typography level="h4" component="h1">
-              <b>Welcome!</b>
-            </Typography>
+            <Typography level="h4" component="h1"><b>Welcome!</b></Typography>
             <Typography level="body-sm">Sign in to continue.</Typography>
           </div>
+
           <FormControl>
             <FormLabel>Id</FormLabel>
             <Input
-              // html input attribute
               name="id"
               type="number"
-              placeholder="Registaration Number"
+              placeholder="Registration Number"
+              value={regid ?? ''}
+              onChange={(e) => setRegid(Number(e.target.value))}
             />
           </FormControl>
+
           <FormControl>
             <FormLabel>Password</FormLabel>
             <Input
-              // html input attribute
-              name="password"
-              type="password"
-              placeholder="password"
+              placeholder="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              endDecorator={
+                <IconButton variant="plain" onClick={() => setShowPassword(prev => !prev)}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              }
             />
           </FormControl>
-          <Button sx={{ mt: 1 /* margin top */ }}>Log in</Button>
+
+          <Button  onClick={handelLogin} sx={{ mt: 1 }}>Log in</Button>
+
           <Typography
             endDecorator={<Link href="/sign-up">Forgot password</Link>}
             sx={{ fontSize: 'sm', alignSelf: 'center' }}

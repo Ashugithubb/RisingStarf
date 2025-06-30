@@ -14,7 +14,7 @@ export default function Footer() {
     >
       <Container maxWidth="sm">
         <Typography variant="body1" align="center">
-          © {new Date().getFullYear()} Your Company
+          © {new Date().getFullYear()} Ashutosh
         </Typography>
       </Container>
     </Box>

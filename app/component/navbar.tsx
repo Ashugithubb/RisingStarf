@@ -16,13 +16,13 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { useRouter } from 'next/navigation';
 
 
-const pages = ['Rising Stars','Test Mangement'];
-const settings = ['Profile', 'Logout'];
+const pages = ['Home', 'Test Mangement'];
+const settings = ['Fees Dashboard', 'Logout'];
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-    const router = useRouter();
+  const router = useRouter();
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -37,20 +37,30 @@ function ResponsiveAppBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-   const handleMenuClick = (setting: string) => {
-    if (setting === 'Profile') {
-      router.push('/fees'); 
+  const handleMenuClick = (setting: string) => {
+    if (setting === 'Fees Dashboard') {
+      router.push('/fees');
     }
     if (setting === 'Logout') {
-     router.push('/login')
+      router.push('/login')
     }
-    handleCloseUserMenu(); 
+    handleCloseUserMenu();
   };
+  const handelHome = (str: string) => {
+    if (str == 'Home') {
+      router.push('/dashboard');
+    }
+    if (str == 'Test Mangement') {
+      router.push('/test')
+    }
+    handleCloseNavMenu()
+  }
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
+   <AppBar position="sticky" sx={{ width: '100%', top: 0, zIndex: 1100, background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
+  <Container maxWidth={false} disableGutters sx={{ px: 2 }}>
+    <Toolbar disableGutters sx={{ width: '100%', justifyContent: 'space-between' }}>
+
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
@@ -63,11 +73,11 @@ function ResponsiveAppBar() {
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit',
+              color: 'yellow',
               textDecoration: 'none',
             }}
           >
-            LOGO
+            Rising Star
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -121,23 +131,31 @@ function ResponsiveAppBar() {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            Rising Star
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handelHome(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
               </Button>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 0 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: 'white' }}>
+                Priya Sharma
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'white' }}>
+                Reg. No: RS12345
+              </Typography>
+            </Box>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar sx={{ width: "60px", height: "" }} alt="Remy Sharp" src="pexels.jpg" />
               </IconButton>
             </Tooltip>
             <Menu
@@ -156,6 +174,7 @@ function ResponsiveAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={() => handleMenuClick(setting)}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
