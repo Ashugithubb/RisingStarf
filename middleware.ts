@@ -9,7 +9,6 @@ export function middleware(request: NextRequest) {
     if(token){
         return NextResponse.next();
     }
-  // Just allow the request for now
   return  NextResponse.redirect(new URL('/login', request.url));
 }
 
