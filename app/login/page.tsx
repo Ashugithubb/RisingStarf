@@ -12,16 +12,23 @@ import Link from '@mui/joy/Link';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { IconButton } from '@mui/joy';
 import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
+import { boolean } from 'zod';
+// import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/joy/CircularProgress';
+import { Box } from '@mui/system';
 
 export default function LoginFinal(props: any) {
   const [showPassword, setShowPassword] = React.useState(false);
   const [regid, setRegid] = React.useState<number | null>(null);
   const [password, setPassword] = React.useState('');
+  const [Loading, setLoading] = React.useState<boolean>(false)
   const router = useRouter();
-
+  const notify = () => toast("Login SuccessFull!");
   const handelLogin = async () => {
     try {
+      setLoading(true);
       const res = await axios.post('http://localhost:3333/auth/login', {
         Regid: regid,
         password: password,
@@ -32,9 +39,12 @@ export default function LoginFinal(props: any) {
         withCredentials: true
 
       });
-      console.log(res.data); 
+      notify()
+      setLoading(false);
       await router.push("/dashboard");
     } catch (error) {
+      setLoading(false);
+      toast("Login failed")
       console.error('Login failed', error);
     }
   }
@@ -45,6 +55,7 @@ export default function LoginFinal(props: any) {
       minHeight: '100vh',
       padding: '2rem',
     }}>
+      <ToastContainer />
       <CssVarsProvider {...props}>
         <CssBaseline />
         <Sheet
@@ -93,7 +104,17 @@ export default function LoginFinal(props: any) {
             />
           </FormControl>
 
-          <Button  onClick={handelLogin} sx={{ mt: 1 }}>Log in</Button>
+
+          <Button onClick={handelLogin} sx={{ mt: 1 }}>
+            Log in
+          </Button>
+
+          {Loading ? 
+            (<Box sx={{display:"flex", justifyContent:"center"}}><CircularProgress /></Box>)
+          : ""}
+
+
+
 
           <Typography
             endDecorator={<Link href="/sign-up">Forgot password</Link>}

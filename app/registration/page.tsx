@@ -14,7 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { studentSchema } from './student.schema.zod';
 import { useState } from 'react';
 import axios from 'axios';
-
+import { ToastContainer, toast } from 'react-toastify';
 type FormData = z.infer<typeof studentSchema>;
 
 export default function StudentRegisterForm() {
@@ -30,40 +30,64 @@ export default function StudentRegisterForm() {
     },
   });
 
+ const notify = () => toast("Student Registered!");
+ const notify2 = () => toast("Image Uploaded!");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [cloudUrl, setCloudUrl] = useState<string>("");
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const res = await axios.post("http://localhost:3333/student/upload", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+         
+        });
+
+        setCloudUrl(res.data);
+        console.log(res.data);
+         notify2();
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
-  const onSubmit = async (data: FormData) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, String(value));
-    });
-    // if (avatarFile) {
-    //   formData.append('avatar', avatarFile);
-    // }
-    // console.log('Final form data:', data);
-    //  const res =  await axios.post('http://localhost:3333/student/add',data);
+  const onSubmit = async (formData: FormData) => {
+    const payload = {
+      Regid: formData.Regid,
+      Name: formData.Name,
+      Class: formData.Class,
+      School: formData.School,
+      PhoneNo: formData.PhoneNo,
+      Father_Name: formData.Father_Name,
+      ParentNo: formData.Parent_Number,
+      Address: formData.Address,
+      password: formData.password,
+      avatar: cloudUrl
+    }
 
-    //  console.log('Final form res:', res);
-    const res = await axios.post('http://localhost:3333/student/add', data, {
+    const res = await axios.post('http://localhost:3333/student/add', payload, {
       headers: {
         'Content-Type': 'application/json'
       }
     });
+    notify();
     console.log(res);
 
   };
 
   return (
+   
     <Paper sx={{ maxWidth: 500, p: 4, m: 'auto', mt: 6 }}>
+       <ToastContainer />
       <Typography variant="h5" mb={3} textAlign="center">
         Student Registration
       </Typography>
@@ -95,7 +119,7 @@ export default function StudentRegisterForm() {
           fullWidth
           margin="normal"
           {...register('Name')}
-          error={!!errors. Name}
+          error={!!errors.Name}
           helperText={errors.Name?.message}
         />
         <TextField
